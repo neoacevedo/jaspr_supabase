@@ -8,7 +8,7 @@ Add `jaspr_supabase` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  jaspr_supabase: ^0.0.1
+  jaspr_supabase: 26.2.19
 ```
 
 ## Usage
@@ -42,13 +42,13 @@ class App extends StatefulComponent {
 
 class _AppState extends State<App> with SupabaseAuth<App> {
   @override
-  void onAuthStateChange(AuthChangeEvent event, Session? session) {
+  void onAuthStateChange(event, session) {
     // Handle auth state change
     print('Auth event: $event');
   }
 
   @override
-  Iterable<Component> build(BuildContext context) sync* {
+  Component build(BuildContext context) {
     // ...
   }
 }
