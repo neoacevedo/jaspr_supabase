@@ -6,7 +6,7 @@ import 'package:supabase/supabase.dart';
 import 'supabase.dart';
 
 /// Mixin to manage Supabase Auth state in Jaspr components.
-mixin SupabaseAuth<T extends StatefulComponent> on State<T> {
+mixin SupabaseAuthMixin<T extends StatefulComponent> on State<T> {
   late final StreamSubscription<AuthState> _authStateSubscription;
 
   bool _mounted = false;

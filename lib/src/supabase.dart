@@ -1,6 +1,9 @@
+import 'package:jaspr_supabase/jaspr_supabase.dart';
 import 'package:supabase/supabase.dart';
 import 'dart:async';
 import 'package:http/http.dart'; // For Client
+import 'package:async/async.dart';
+import 'auth.dart';
 
 /// Supabase instance.
 ///
@@ -27,6 +30,11 @@ class Supabase {
 
   bool _initialized = false;
 
+  // ignore: unused_field
+  SupabaseAuth? _supabaseAuth;
+
+  CancelableOperation<Session?>? _restoreSessionCancellableOperation;
+
   /// Initialize the Supabase instance.
   ///
   /// [url] and [anonKey] can be found on your Supabase dashboard.
@@ -37,17 +45,36 @@ class Supabase {
   static Future<Supabase> initialize({
     required String url,
     required String anonKey,
-    AuthClientOptions authOptions = const AuthClientOptions(),
+    JasprAuthClientOptions authOptions = const JasprAuthClientOptions(),
     RealtimeClientOptions realtimeClientOptions = const RealtimeClientOptions(),
     StorageClientOptions storageOptions = const StorageClientOptions(),
     PostgrestClientOptions postgrestOptions = const PostgrestClientOptions(),
     Map<String, String>? headers,
     Client? httpClient,
+    Future<String?> Function()? accessToken,
     bool? debug,
   }) async {
     if (_instance._initialized) {
       // Supabase instance is already initialized
       return _instance;
+    }
+
+    if (authOptions.pkceAsyncStorage == null) {
+      authOptions = authOptions.copyWith(pkceAsyncStorage: SharedPreferencesGotrueAsyncStorage());
+    }
+
+    if (authOptions.storage == null) {
+      authOptions = authOptions.copyWith(storage: SharedPreferencesStorage("sb-${Uri.parse(url).host.split(".").first}-auth-token"));
+    }
+
+    if (accessToken == null) {
+      final supabaseAuth = SupabaseAuth();
+      _instance._supabaseAuth = supabaseAuth;
+      await supabaseAuth.initialize(options: authOptions);
+
+      // Wrap `recoverSession()` in a `CancelableOperation` so that it can be canceled in dispose
+      // if still in progress
+      _instance._restoreSessionCancellableOperation = CancelableOperation.fromFuture(supabaseAuth.recoverSession());
     }
 
     _instance._init(
@@ -60,6 +87,16 @@ class Supabase {
       headers: headers,
       httpClient: httpClient,
     );
+
+    if (accessToken == null) {
+      final supabaseAuth = SupabaseAuth();
+      _instance._supabaseAuth = supabaseAuth;
+      await supabaseAuth.initialize(options: authOptions);
+
+      // Wrap `recoverSession()` in a `CancelableOperation` so that it can be canceled in dispose
+      // if still in progress
+      _instance._restoreSessionCancellableOperation = CancelableOperation.fromFuture(supabaseAuth.recoverSession());
+    }
 
     return _instance;
   }
@@ -91,7 +128,8 @@ class Supabase {
   SupabaseClient get client => _client;
 
   /// Dispose the instance to free up resources.
-  void dispose() {
+  Future<void> dispose() async {
+    await _restoreSessionCancellableOperation?.cancel();
     _client.dispose();
     _initialized = false;
   }

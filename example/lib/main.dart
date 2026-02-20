@@ -14,7 +14,7 @@ class App extends StatefulComponent {
   State<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> with SupabaseAuth<App> {
+class _AppState extends State<App> with SupabaseAuthMixin<App> {
   String _authStatus = 'Not logged in';
   String _email = '';
   String _password = '';
