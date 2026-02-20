@@ -1,6 +1,6 @@
 name: jaspr_supabase
 description: A Jaspr package for Supabase, replicating the experience of supabase_flutter.
-version: 26.2.19
+version: 26.2.20
 homepage: https://www.neoacevedo.nom.co
 repository: https://github.com/neoacevedo/jaspr_supabase.git
 

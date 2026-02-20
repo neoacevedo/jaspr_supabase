@@ -45,7 +45,10 @@ class Supabase {
     Client? httpClient,
     bool? debug,
   }) async {
-    assert(!_instance._initialized, 'Supabase instance is already initialized');
+    if (_instance._initialized) {
+      // Supabase instance is already initialized
+      return _instance;
+    }
 
     _instance._init(
       url,
