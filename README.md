@@ -61,3 +61,20 @@ Access the `SupabaseClient` instance anywhere:
 ```dart
 final client = Supabase.instance.client;
 ```
+
+## Donations
+
+If this project is useful to you, consider making a donation:
+
+<div align="center">
+
+| Ko-fi                                                  | Litecoin                                                     |
+| ------------------------------------------------------ | ------------------------------------------------------------ |
+| [![Ko-fi QR](ko-fi.png)](https://ko-fi.com/neoacevedo) | <img title="" src="Litecoin.jpg" alt="Litecoin" width="399"> |
+| ☕ [Ko-fi](https://ko-fi.com/neoacevedo)                | Ł Donaciones Litecoin                                        |
+
+</div>
+
+## License
+
+This project is licensed under the GPL-3.0+ License - see the [LICENSE](LICENSE) file for more details.
