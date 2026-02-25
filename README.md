@@ -8,13 +8,13 @@ Add `jaspr_supabase` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  jaspr_supabase: 26.2.19
+  jaspr_supabase: 26.2.24
 ```
 
 ## Architecture: Pure Single Page Application (SPA)
 
 > [!IMPORTANT]  
-> As of version `26.2.24`, `jaspr_supabase` is designed **strictly for Client-Side Single Page Applications (SPA)**. 
+> As of version `26.2.24`, `jaspr_supabase` is designed **strictly for Client-Side Single Page Applications (SPA) or Static Generated Sites (SSG) with client-side annotations**. 
 > 
 > All server-side `Context` and `Cookie` logic has been completely removed to prevent critical race conditions and cross-user data bleeding when deployed on server environments. Session persistence relies natively on `window.localStorage` directly in the user's browser, matching the exact behavior of `supabase_flutter`.
 
