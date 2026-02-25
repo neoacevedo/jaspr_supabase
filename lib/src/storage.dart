@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:jaspr/server.dart';
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr/server.dart' if (dart.library.js_util) 'context_extensions.dart';
 import 'package:supabase/supabase.dart';
 import 'package:universal_web/web.dart';
 
@@ -40,8 +41,8 @@ class EmptyLocalStorage extends Storage {
   Future<void> persistSession(persistSessionString) async {}
 }
 
-/// Storage implementation using cookies for server-side persistence.
-class SharedPreferencesStorage implements Storage {
+/// Storage implementation using localStorage for client-side persistence.
+class SharedPreferencesStorage extends GotrueAsyncStorage implements Storage {
   SharedPreferencesStorage(
     this.persistSessionKey, {
     this.context,
@@ -52,6 +53,8 @@ class SharedPreferencesStorage implements Storage {
   });
 
   final String persistSessionKey;
+
+  // These are kept for constructor backward compatibility but are unused in SPA mode
   final BuildContext? context;
   final Duration? expires;
   final bool secure;
@@ -62,38 +65,43 @@ class SharedPreferencesStorage implements Storage {
 
   @override
   Future<bool> hasAccessToken() async {
-    return _useWebLocalStorage
-        ? window.localStorage.getItem(persistSessionKey) != null
-        : context?.cookies[persistSessionKey] != null;
+    if (!_useWebLocalStorage) return false;
+    return window.localStorage.getItem(persistSessionKey) != null;
   }
 
   @override
   Future<String?> accessToken() async {
-    return _useWebLocalStorage ? window.localStorage.getItem(persistSessionKey) : context?.cookies[persistSessionKey];
+    if (!_useWebLocalStorage) return null;
+    return window.localStorage.getItem(persistSessionKey);
   }
 
   @override
   Future<void> removePersistedSession() async {
-    context?.setCookie(
-      persistSessionKey,
-      '',
-      expires: DateTime.now().subtract(const Duration(days: -1000)),
-      path: path,
-      secure: secure,
-      domain: domain,
-    );
+    if (_useWebLocalStorage) {
+      window.localStorage.removeItem(persistSessionKey);
+    }
   }
 
   @override
   Future<void> persistSession(String persistSessionString) async {
-    context?.setCookie(
-      persistSessionKey,
-      persistSessionString,
-      expires: DateTime.now().subtract(expires ?? const Duration(days: 1)),
-      path: path,
-      secure: secure,
-      domain: domain,
-    );
+    if (_useWebLocalStorage) {
+      window.localStorage.setItem(persistSessionKey, persistSessionString);
+    }
+  }
+
+  @override
+  Future<String?> getItem({required String key}) async {
+    return accessToken();
+  }
+
+  @override
+  Future<void> setItem({required String key, required String value}) async {
+    await persistSession(value);
+  }
+
+  @override
+  Future<void> removeItem({required String key}) async {
+    await removePersistedSession();
   }
 }
 

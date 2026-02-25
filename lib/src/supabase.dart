@@ -3,7 +3,6 @@ import 'package:supabase/supabase.dart';
 import 'dart:async';
 import 'package:http/http.dart'; // For Client
 import 'package:async/async.dart';
-import 'auth.dart';
 
 /// Supabase instance.
 ///
@@ -59,22 +58,14 @@ class Supabase {
       return _instance;
     }
 
+    final storage = SharedPreferencesStorage("sb-${Uri.parse(url).host.split(".").first}-auth-token");
+
     if (authOptions.pkceAsyncStorage == null) {
-      authOptions = authOptions.copyWith(pkceAsyncStorage: SharedPreferencesGotrueAsyncStorage());
+      authOptions = authOptions.copyWith(pkceAsyncStorage: storage);
     }
 
     if (authOptions.storage == null) {
-      authOptions = authOptions.copyWith(storage: SharedPreferencesStorage("sb-${Uri.parse(url).host.split(".").first}-auth-token"));
-    }
-
-    if (accessToken == null) {
-      final supabaseAuth = SupabaseAuth();
-      _instance._supabaseAuth = supabaseAuth;
-      await supabaseAuth.initialize(options: authOptions);
-
-      // Wrap `recoverSession()` in a `CancelableOperation` so that it can be canceled in dispose
-      // if still in progress
-      _instance._restoreSessionCancellableOperation = CancelableOperation.fromFuture(supabaseAuth.recoverSession());
+      authOptions = authOptions.copyWith(storage: storage);
     }
 
     _instance._init(
