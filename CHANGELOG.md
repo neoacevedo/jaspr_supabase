@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [26.6.24+2]
+
+- **chore**: bump jaspr to ^0.23.0, SDK to >=3.10.0, and version to 26.6.24+2
+- **docs**: update README with jaspr_supabase ^26.6.24, fix import and component syntax
+
 ## [26.2.24]
 
 - **Fix**: Re-implemented `SupabaseAuth.recoverSession()` using the official `supabase_flutter` logic to properly read sessions from `localStorage` and trigger `AuthChangeEvent.initialSession` on page reload.
