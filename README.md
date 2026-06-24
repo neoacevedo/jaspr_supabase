@@ -8,7 +8,7 @@ Add `jaspr_supabase` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  jaspr_supabase: 26.2.24
+  jaspr_supabase: ^26.6.24
 ```
 
 ## Architecture: Pure Single Page Application (SPA)
@@ -44,6 +44,7 @@ To prevent your router from redirecting an already-logged-in user to the login p
 Use the `SupabaseAuth` mixin in your root component:
 
 ```dart
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_router/jaspr_router.dart';
 import 'package:jaspr_supabase/jaspr_supabase.dart';
@@ -76,7 +77,7 @@ class _AppState extends State<App> with SupabaseAuth<App> {
   @override
   Component build(BuildContext context) {
     if (!_initialized) {
-      return div([text('Loading session...')]);
+      return div([.text('Loading session...')]);
     }
 
     final session = Supabase.instance.client.auth.currentSession;
